@@ -101,6 +101,13 @@ api_config_save:
     defaults:
         _api_collection_operation_name: 'saveConfig'
 
+api_contract_make_contract_permanent:
+    path: /contracts/{id}/make_permanent
+    methods: [PUT]
+    controller: App\Controller\ContractController::makeContractPermanent
+    defaults:
+        _api_collection_operation_name: 'makeContractPermanent'
+
 api_contract_terminate_contract:
     path: /contracts/{id}/terminate
     methods: [PUT]

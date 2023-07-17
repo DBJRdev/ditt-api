@@ -11,6 +11,14 @@ App\Entity\Contract:
             normalization_context:
                 groups:
                     - contract_out_detail
+        makeContractPermanent:
+            method: PUT
+            route_name: api_contract_make_contract_permanent
+            normalization_context:
+                groups:
+                    - contract_out_detail
+            swagger_context:
+                summary: Make Contract permanent.
         terminateContract:
             method: PUT
             route_name: api_contract_terminate_contract
@@ -18,7 +26,7 @@ App\Entity\Contract:
                 groups:
                     - contract_out_detail
             swagger_context:
-                summary: Terminate Contracts.
+                summary: Terminate Contract.
                 parameters:
                     -   name: dateTime
                         description: 'Date time of termination'

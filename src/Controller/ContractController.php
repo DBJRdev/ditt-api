@@ -47,6 +47,39 @@ class ContractController extends AbstractController
         $this->workMonthRepository = $workMonthRepository;
     }
 
+    public function makeContractPermanent(Request $request, int $id): Response
+    {
+        $contract = $this->contractRepository->getRepository()->find($id);
+        if (!$contract || !$contract instanceof Contract) {
+            throw $this->createNotFoundException(sprintf('Contract with id %d was not found.', $id));
+        }
+
+        if ($contract->getEndDateTime() == null) {
+            throw $this->createNotFoundException(sprintf('Contract with id %d is already permanent.', $id));
+        }
+
+        $contactsAfter = $this->contractRepository->findContractsAfter($contract);
+
+        if (count($contactsAfter) > 0) {
+            return JsonResponse::create(
+                [
+                    'detail' => 'Unable to make contract permanent. There are some contracts .',
+                    'contractsAfter' => $this->normalizer->normalize(
+                        $contactsAfter,
+                        WorkMonth::class,
+                        ['groups' => ['contract_out_list']]
+                    ),
+                ],
+                JsonResponse::HTTP_BAD_REQUEST
+            );
+        }
+
+        $contract->setEndDateTime(null);
+        $this->entityManager->flush();
+
+        return JsonResponse::create(null, JsonResponse::HTTP_OK);
+    }
+
     public function terminateContract(Request $request, int $id): Response
     {
         $contract = $this->contractRepository->getRepository()->find($id);

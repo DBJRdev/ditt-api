@@ -210,7 +210,11 @@ class ResourceVoter extends Voter
     private function canEditContract(Contract $contract, User $user, TokenInterface $token): bool
     {
         try {
-            return $contract->getUser() === $user || $this->decisionManager->decide($token, [User::ROLE_ADMIN]);
+            return $contract->getUser()->getId() !== $user->getId()
+                && (
+                    in_array($user, $contract->getUser()->getAllSupervisors())
+                    || $this->decisionManager->decide($token, [User::ROLE_SUPER_ADMIN])
+                );
         } catch (\TypeError $e) {
             return true;
         }
