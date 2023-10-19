@@ -24,42 +24,55 @@ App\Entity\WorkMonth:
         banWorkLogs:
             targetEntity: App\Entity\BanWorkLog
             mappedBy: workMonth
+            cascade: [remove]
         businessTripWorkLogs:
             targetEntity: App\Entity\BusinessTripWorkLog
             mappedBy: workMonth
+            cascade: [remove]
         homeOfficeWorkLogs:
             targetEntity: App\Entity\HomeOfficeWorkLog
             mappedBy: workMonth
+            cascade: [remove]
         maternityProtectionWorkLogs:
             targetEntity: App\Entity\MaternityProtectionWorkLog
             mappedBy: workMonth
+            cascade: [remove]
         overtimeWorkLogs:
             targetEntity: App\Entity\OvertimeWorkLog
             mappedBy: workMonth
+            cascade: [remove]
         parentalLeaveWorkLogs:
             targetEntity: App\Entity\ParentalLeaveWorkLog
             mappedBy: workMonth
+            cascade: [remove]
         sickDayUnpaidWorkLogs:
             targetEntity: App\Entity\SickDayUnpaidWorkLog
             mappedBy: workMonth
+            cascade: [remove]
         sickDayWorkLogs:
             targetEntity: App\Entity\SickDayWorkLog
             mappedBy: workMonth
+            cascade: [remove]
         specialLeaveWorkLogs:
             targetEntity: App\Entity\SpecialLeaveWorkLog
             mappedBy: workMonth
+            cascade: [remove]
         timeOffWorkLogs:
             targetEntity: App\Entity\TimeOffWorkLog
             mappedBy: workMonth
+            cascade: [remove]
         trainingWorkLogs:
             targetEntity: App\Entity\TrainingWorkLog
             mappedBy: workMonth
+            cascade: [remove]
         vacationWorkLogs:
             targetEntity: App\Entity\VacationWorkLog
             mappedBy: workMonth
+            cascade: [remove]
         workLogs:
             targetEntity: App\Entity\WorkLog
             mappedBy: workMonth
+            cascade: [remove]
             orderBy:
                 startTime: ASC
 

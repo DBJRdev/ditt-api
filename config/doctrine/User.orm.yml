@@ -52,7 +52,7 @@ App\Entity\User:
         notifications:
             targetEntity: App\Entity\UserNotifications
             mappedBy: user
-            cascade: [persist]
+            cascade: [persist, remove]
 
     oneToMany:
         contracts:
@@ -65,13 +65,15 @@ App\Entity\User:
         vacations:
             targetEntity: App\Entity\Vacation
             mappedBy: user
-            cascade: [persist]
+            cascade: [persist, remove]
         workMonths:
             targetEntity: App\Entity\WorkMonth
             mappedBy: user
+            cascade: [remove]
         yearStats:
             targetEntity: App\Entity\UserYearStats
             mappedBy: user
+            cascade: [remove]
 
     manyToOne:
         supervisor:
