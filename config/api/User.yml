@@ -24,6 +24,7 @@ App\Entity\User:
             method: 'GET'
             filters:
                 - 'app.property_filter.users'
+                - 'app.search_filter.users'
             normalization_context:
                 enable_max_depth: true
                 groups:
@@ -42,6 +43,24 @@ App\Entity\User:
                     - contract_in
                     - user_in
                     - vacation_in
+        archiveUser:
+            method: PUT
+            route_name: api_users_archive
+            normalization_context:
+                groups:
+                    - user_out_detail
+                    - vacation_out_list
+            swagger_context:
+                summary: Marks the User as archived.
+        unarchiveUser:
+            method: PUT
+            route_name: api_users_unarchive
+            normalization_context:
+                groups:
+                    - user_out_detail
+                    - vacation_out_list
+            swagger_context:
+                summary: Marks the User as unarchived.
     itemOperations:
         get:
             method: 'GET'

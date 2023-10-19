@@ -409,6 +409,20 @@ api_vacation_work_log_support_bulk_create:
     defaults:
         _api_collection_operation_name: 'bulkCreate'
 
+api_users_archive:
+    path: /users/{id}/archive
+    methods: [PUT]
+    controller: App\Controller\UserController::archiveUser
+    defaults:
+        _api_collection_operation_name: 'archiveUser'
+
+api_users_unarchive:
+    path: /users/{id}/unarchive
+    methods: [PUT]
+    controller: App\Controller\UserController::unarchiveUser
+    defaults:
+        _api_collection_operation_name: 'unarchiveUser'
+
 api_users_renew_api_token:
     path: /users/{id}/api_token/renew
     methods: [PUT]

@@ -20,6 +20,10 @@ class UserChecker implements UserCheckerInterface
             throw new AccountDisabledException(sprintf('User "%s" is not active.', $user->getUsername()));
         }
 
+        if ($user->getIsArchived()) {
+            throw new AccountDisabledException(sprintf('User "%s" is archived.', $user->getUsername()));
+        }
+
         return $user;
     }
 

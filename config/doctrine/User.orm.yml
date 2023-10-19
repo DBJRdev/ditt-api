@@ -28,6 +28,9 @@ App\Entity\User:
         isActive:
             type: boolean
 
+        isArchived:
+            type: boolean
+
         roles:
             type: json_array
 

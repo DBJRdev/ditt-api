@@ -64,6 +64,15 @@ App\Entity\User:
                 - user_out_api_token_detail
                 - supervised_user_out_list
                 - user_in
+        isArchived:
+            groups:
+                - user_out_list
+                - user_out_detail
+                - user_out_api_token_detail
+                - supervised_user_out_list
+                - special_approvals_out_list
+                - user_in
+                - hr_out_detail
         roles:
             groups:
                 - user_out_list

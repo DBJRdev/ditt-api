@@ -75,6 +75,28 @@ class UserRepository
     /**
      * @return User[]
      */
+    public function getAllArchived(): array
+    {
+        /** @var User[] $users */
+        $users = $this->repository->findBy(['isArchived' => true]);
+
+        return $users;
+    }
+
+    /**
+     * @return User[]
+     */
+    public function getAllUnarchived(): array
+    {
+        /** @var User[] $users */
+        $users = $this->repository->findBy(['isArchived' => false]);
+
+        return $users;
+    }
+
+    /**
+     * @return User[]
+     */
     public function getAllAdmins(): array
     {
         $rsm = new ResultSetMappingBuilder($this->entityManager);

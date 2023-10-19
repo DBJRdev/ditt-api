@@ -36,6 +36,18 @@ class UserService
         $this->vacationWorkLogRepository = $vacationWorkLogRepository;
     }
 
+    public function archiveUser(User $user): void
+    {
+        $user->setIsArchived(true);
+        $this->entityManager->flush();
+    }
+
+    public function unarchiveUser(User $user): void
+    {
+        $user->setIsArchived(false);
+        $this->entityManager->flush();
+    }
+
     /**
      * @throws \Doctrine\ORM\NonUniqueResultException
      */

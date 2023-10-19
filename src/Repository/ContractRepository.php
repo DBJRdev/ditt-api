@@ -6,6 +6,7 @@ use App\Entity\Contract;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\UnexpectedResultException;
 
 class ContractRepository
 {
@@ -23,6 +24,22 @@ class ContractRepository
         return $this->repository;
     }
 
+    public function findActiveContract(User $user, \DateTimeImmutable $currentDate): ?Contract
+    {
+        try {
+            return $this->repository->createQueryBuilder('c')
+                ->where('c.user = :user')
+                ->andWhere('c.startDateTime <= :currentDate')
+                ->andWhere('c.endDateTime >= :currentDate OR c.endDateTime IS NULL')
+                ->setParameter('user', $user->getId())
+                ->setParameter('currentDate', $currentDate)
+                ->getQuery()
+                ->getSingleResult();
+        } catch (UnexpectedResultException $e) {
+            return null;
+        }
+    }
+
     public function findContractsBetweenDates(User $user, \DateTimeImmutable $dateFrom, \DateTimeImmutable $dateTo): array
     {
         return $this->repository->createQueryBuilder('c')
@@ -32,6 +49,17 @@ class ContractRepository
             ->setParameter('user', $user->getId())
             ->setParameter('dateFrom', $dateFrom)
             ->setParameter('dateTo', $dateTo)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findContractsAfterDate(User $user, \DateTimeImmutable $date): array
+    {
+        return $this->repository->createQueryBuilder('c')
+            ->where('c.user = :user')
+            ->andWhere('c.startDateTime >= :date')
+            ->setParameter('user', $user->getId())
+            ->setParameter('date', $date)
             ->getQuery()
             ->getResult();
     }

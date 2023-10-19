@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\SickDayWorkLog;
 use App\Entity\User;
 use App\Event\UserPasswordResetEvent;
+use App\Repository\ContractRepository;
 use App\Repository\SickDayWorkLogRepository;
 use App\Repository\UserRepository;
 use App\Service\UserService;
@@ -20,6 +21,11 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class UserController extends AbstractController
 {
+    /**
+     * @var ContractRepository
+     */
+    private $contractRepository;
+
     /**
      * @var JWTTokenManagerInterface
      */
@@ -61,6 +67,7 @@ class UserController extends AbstractController
     private $eventDispatcher;
 
     public function __construct(
+        ContractRepository $contractRepository,
         JWTTokenManagerInterface $jwtTokenManager,
         NormalizerInterface $normalizer,
         SickDayWorkLogRepository $sickDayWorkLogRepository,
@@ -70,6 +77,7 @@ class UserController extends AbstractController
         ValidatorInterface $validator,
         EventDispatcherInterface $eventDispatcher
     ) {
+        $this->contractRepository = $contractRepository;
         $this->jwtTokenManager = $jwtTokenManager;
         $this->normalizer = $normalizer;
         $this->sickDayWorkLogRepository = $sickDayWorkLogRepository;
@@ -78,6 +86,75 @@ class UserController extends AbstractController
         $this->userService = $userService;
         $this->validator = $validator;
         $this->eventDispatcher = $eventDispatcher;
+    }
+
+    public function archiveUser(Request $request, int $id): Response
+    {
+        $user = $this->userRepository->getRepository()->find($id);
+        if (!$user || !$user instanceof User) {
+            throw $this->createNotFoundException(sprintf('User with id %d was not found', $id));
+        }
+
+        if ($user->getIsArchived()) {
+            return JsonResponse::create(
+                ['detail' => 'User is already archived.'],
+                JsonResponse::HTTP_BAD_REQUEST
+            );
+        }
+
+        $currentDateTime = new \DateTimeImmutable();
+        $activeContract = $this->contractRepository->findActiveContract($user, $currentDateTime);
+        if ($activeContract) {
+            return JsonResponse::create(
+                ['detail' => 'User has active contract.'],
+                JsonResponse::HTTP_BAD_REQUEST
+            );
+        }
+
+        $futureContracts = $this->contractRepository->findContractsAfterDate($user, $currentDateTime);
+        if (count($futureContracts) > 0) {
+            return JsonResponse::create(
+                ['detail' => 'User has future contracts.'],
+                JsonResponse::HTTP_BAD_REQUEST
+            );
+        }
+
+        $this->userService->archiveUser($user);
+
+        return JsonResponse::create(
+            $this->normalizer->normalize(
+                $user,
+                User::class,
+                ['groups' => ['user_out_detail']]
+            ),
+            JsonResponse::HTTP_OK
+        );
+    }
+
+    public function unarchiveUser(Request $request, int $id): Response
+    {
+        $user = $this->userRepository->getRepository()->find($id);
+        if (!$user || !$user instanceof User) {
+            throw $this->createNotFoundException(sprintf('User with id %d was not found', $id));
+        }
+
+        if (!$user->getIsArchived()) {
+            return JsonResponse::create(
+                ['detail' => 'User is already unarchived.'],
+                JsonResponse::HTTP_BAD_REQUEST
+            );
+        }
+
+        $this->userService->unarchiveUser($user);
+
+        return JsonResponse::create(
+            $this->normalizer->normalize(
+                $user,
+                User::class,
+                ['groups' => ['user_out_detail']]
+            ),
+            JsonResponse::HTTP_OK
+        );
     }
 
     public function getUserByApiToken(string $apiToken): Response
@@ -286,6 +363,10 @@ class UserController extends AbstractController
                 return $supervisedUser->getIsActive();
             });
         }
+
+        $supervisedUsers = array_filter($supervisedUsers, function (User $supervisedUser) {
+            return !$supervisedUser->getIsArchived();
+        });
 
         $this->userService->fulfillLastApprovedWorkMonth($supervisedUsers);
 

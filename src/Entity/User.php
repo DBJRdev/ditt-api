@@ -56,6 +56,11 @@ class User implements UserInterface
     private $isActive;
 
     /**
+     * @var bool
+     */
+    private $isArchived;
+
+    /**
      * @var string[]
      */
     private $roles;
@@ -226,6 +231,18 @@ class User implements UserInterface
     public function setIsActive(bool $isActive): User
     {
         $this->isActive = $isActive;
+
+        return $this;
+    }
+
+    public function getIsArchived(): bool
+    {
+        return $this->isArchived;
+    }
+
+    public function setIsArchived(bool $isArchived): User
+    {
+        $this->isArchived = $isArchived;
 
         return $this;
     }

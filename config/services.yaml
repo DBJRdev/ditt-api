@@ -76,6 +76,16 @@ services:
         autoconfigure: false
         public: false
 
+    app.search_filter.users:
+        parent: 'api_platform.doctrine.orm.search_filter'
+        arguments: [{ isArchived: 'exact' }]
+        tags:
+            $name: 'api_platform.filter'
+            $id: 'search_filter.users'
+        autowire: false
+        autoconfigure: false
+        public: false
+
     # Commands
 
     App\Command\NotificationsCommand:

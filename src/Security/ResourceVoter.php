@@ -86,6 +86,10 @@ class ResourceVoter extends Voter
             return false;
         }
 
+        if (!$user->getIsActive() || $user->getIsArchived()) {
+            return false;
+        }
+
         if ($attribute === self::VIEW) {
             return $this->canView($subject, $user, $token);
         } elseif ($attribute === self::EDIT) {

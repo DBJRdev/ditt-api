@@ -60,6 +60,7 @@ class HrController extends AbstractController
     {
         $dateFrom = \DateTimeImmutable::createFromFormat('d.m.Y', $request->query->get('dateFrom'));
         $dateTo = \DateTimeImmutable::createFromFormat('d.m.Y', $request->query->get('dateTo'));
+        $includeArchived = $request->query->get('includeArchived') === 'true';
 
         if ($dateFrom === false || $dateTo === false) {
             return JsonResponse::create(
@@ -84,7 +85,10 @@ class HrController extends AbstractController
         }
 
         $normalizedData = [];
-        foreach ($this->userRepository->getRepository()->findAll() as $user) {
+        $users = $includeArchived
+            ? $this->userRepository->getRepository()->findAll()
+            : $this->userRepository->getAllUnarchived();
+        foreach ($users as $user) {
             $sickDays = $this->sickDayWorkLogRepository->findAllCreatedByUserBetweenTwoDates($user, $dateFrom, $dateTo);
             $contracts = $this->contractRepository->findContractsBetweenDates($user, $dateFrom, $dateTo);
 
@@ -113,9 +117,13 @@ class HrController extends AbstractController
     public function yearOverview(Request $request): Response
     {
         $dateFrom = (new \DateTimeImmutable())->modify('-1 year');
+        $includeArchived = $request->query->get('includeArchived') === 'true';
 
         $normalizedData = [];
-        foreach ($this->userRepository->getRepository()->findAll() as $user) {
+        $users = $includeArchived
+            ? $this->userRepository->getRepository()->findAll()
+            : $this->userRepository->getAllUnarchived();
+        foreach ($users as $user) {
             $sickDays = $this->sickDayWorkLogRepository->findAllByUserFromDate($user, $dateFrom);
 
             $normalizedData[] = [
