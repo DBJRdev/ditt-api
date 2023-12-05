@@ -219,7 +219,10 @@ class WorkMonthService
         $workingHours = [];
 
         for ($day = 1; $day <= intval($dateTo->format('d')); ++$day) {
-            $workingHours[$day] = 0;
+            $workingHours[$day] = [
+                'workingTime' => 0,
+                'workingTimeRaw' => 0,
+            ];
         }
 
         /** @var Contract $contract */
@@ -229,6 +232,10 @@ class WorkMonthService
                     ->setTime(0, 0, 0);
 
                 if ($isWeekend($date) || $isHoliday($date)) {
+                    $workingHours[$day] = [
+                        'workingTime' => 0,
+                        'workingTimeRaw' => ($contract->getWeeklyWorkingHours() / $contract->getWeeklyWorkingDays()) * 3600,
+                    ];
                     continue;
                 }
 
@@ -243,6 +250,10 @@ class WorkMonthService
                         $currentDay = $currentDay->modify('+1 day')
                     ) {
                         if ($isWeekend($currentDay) || $isHoliday($currentDay)) {
+                            $workingHours[$day] = [
+                                'workingTime' => 0,
+                                'workingTimeRaw' => ($contract->getWeeklyWorkingHours() / $contract->getWeeklyWorkingDays()) * 3600,
+                            ];
                             continue;
                         }
 
@@ -250,6 +261,10 @@ class WorkMonthService
                     }
 
                     if ($workingDaysBeforeCurrentDay >= $contract->getWeeklyWorkingDays()) {
+                        $workingHours[$day] = [
+                            'workingTime' => 0,
+                            'workingTimeRaw' => ($contract->getWeeklyWorkingHours() / $contract->getWeeklyWorkingDays()) * 3600,
+                        ];
                         continue;
                     }
                 }
@@ -263,6 +278,10 @@ class WorkMonthService
                         || ($date->format('N') == 5 && !$contract->getIsFridayIncluded())
                     )
                 ) {
+                    $workingHours[$day] = [
+                        'workingTime' => 0,
+                        'workingTimeRaw' => ($contract->getWeeklyWorkingHours() / $contract->getWeeklyWorkingDays()) * 3600,
+                    ];
                     continue;
                 }
 
@@ -270,7 +289,10 @@ class WorkMonthService
                     $contract->getStartDateTime() <= $date
                     && (!$contract->getEndDateTime() || $contract->getEndDateTime() >= $date)
                 ) {
-                    $workingHours[$day] = ($contract->getWeeklyWorkingHours() / $contract->getWeeklyWorkingDays()) * 3600;
+                    $workingHours[$day] = [
+                        'workingTime' => ($contract->getWeeklyWorkingHours() / $contract->getWeeklyWorkingDays()) * 3600,
+                        'workingTimeRaw' => ($contract->getWeeklyWorkingHours() / $contract->getWeeklyWorkingDays()) * 3600,
+                    ];
                 }
             }
         }
@@ -473,13 +495,14 @@ class WorkMonthService
                 }
             }
 
-            if (
-                (count($standardWorkLogs) === 0 && $containsBusinessDay)
-                || $containsMaternityProtection || $containsSickDay || $containsSpecialLeaveDay || $containsVacationDay
+            if (count($standardWorkLogs) === 0 && $containsBusinessDay) {
+                $workTime = $workingHours[$day]['workingTimeRaw'];
+            } elseif (
+                $containsMaternityProtection || $containsSickDay || $containsSpecialLeaveDay || $containsVacationDay
             ) {
-                $workTime = $workingHours[$day];
+                $workTime = $workingHours[$day]['workingTime'];
             } elseif ($containsSickDay && count($standardWorkLogs) > 0) {
-                $workTime = min($workTimeWithoutCorrection, $workingHours[$day]);
+                $workTime = min($workTimeWithoutCorrection, $workingHours[$day]['workingTime']);
             }
 
             $isHoliday = function ($date) use ($config) {
@@ -519,7 +542,7 @@ class WorkMonthService
         // Parental leave work logs are not counted as working hours
         $parentalLeaveWorkLogs = $this->parentalLeaveWorkLogRepository->findAllByWorkMonth($workMonth);
         foreach ($parentalLeaveWorkLogs as $parentalLeaveWorkLog) {
-            $workingHours[intval($parentalLeaveWorkLog->getDate()->format('d'))] = 0;
+            $workingHours[intval($parentalLeaveWorkLog->getDate()->format('d'))]['workingTime'] = 0;
         }
 
         for (
@@ -527,7 +550,7 @@ class WorkMonthService
             (int) $date->format('m') === $workMonth->getMonth();
             $date->add(new \DateInterval('P1D'))
         ) {
-            $requiredHours += $workingHours[intval($date->format('d'))];
+            $requiredHours += $workingHours[intval($date->format('d'))]['workingTime'];
         }
 
         return $requiredHours;

@@ -347,6 +347,7 @@ class ApiTester extends \Codeception\Actor
             'firstName' => 'Jan',
             'lastName' => 'Novák',
             'isActive' => true,
+            'isArchived' => false,
             'plainPassword' => 'password',
             'supervisor' => null,
             'resetPasswordToken' => null,

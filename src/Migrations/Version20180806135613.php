@@ -25,7 +25,10 @@ INSERT INTO app_user_year_stats (user_id, year, vacation_days_used)
 SELECT id, 2018, 0 FROM app_user UNION
 SELECT id, 2019, 0 FROM app_user UNION
 SELECT id, 2020, 0 FROM app_user UNION
-SELECT id, 2021, 0 FROM app_user;
+SELECT id, 2021, 0 FROM app_user UNION
+SELECT id, 2022, 0 FROM app_user UNION
+SELECT id, 2023, 0 FROM app_user UNION
+SELECT id, 2024, 0 FROM app_user;
 EOD
         );
         $this->addSql(<<<EOD
@@ -36,26 +39,26 @@ BEGIN
         UPDATE
             app_user_year_stats ays
         SET
-            vacation_days_used = ( 
+            vacation_days_used = (
                 SELECT COUNT(*)
                 FROM vacation_work_log vwl
                 JOIN work_month wm ON wm.id = vwl.work_month_id
-                WHERE wm.user_id = (SELECT user_id FROM work_month WHERE id = OLD.work_month_id)  
+                WHERE wm.user_id = (SELECT user_id FROM work_month WHERE id = OLD.work_month_id)
                     AND wm.year = (SELECT year FROM work_month WHERE id = OLD.work_month_id)
                     AND vwl.time_rejected IS NULL
             )
         WHERE ays.user_id = (SELECT user_id FROM work_month WHERE id = OLD.work_month_id)
-            AND ays.year = (SELECT year FROM work_month WHERE id = OLD.work_month_id); 
+            AND ays.year = (SELECT year FROM work_month WHERE id = OLD.work_month_id);
         RETURN OLD;
     ELSIF (TG_OP = 'INSERT' OR TG_OP = 'UPDATE') THEN
         UPDATE
             app_user_year_stats ays
         SET
-            vacation_days_used = ( 
+            vacation_days_used = (
                 SELECT COUNT(*)
                 FROM vacation_work_log vwl
                 JOIN work_month wm ON wm.id = vwl.work_month_id
-                WHERE wm.user_id = (SELECT user_id FROM work_month WHERE id = NEW.work_month_id)  
+                WHERE wm.user_id = (SELECT user_id FROM work_month WHERE id = NEW.work_month_id)
                     AND wm.year = (SELECT year FROM work_month WHERE id = NEW.work_month_id)
                     AND vwl.time_rejected IS NULL
             )
