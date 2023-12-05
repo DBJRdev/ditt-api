@@ -26,7 +26,7 @@ DO
 $do$
 BEGIN
     << YEAR_LOOP >>
-    FOR y IN 2018..2021 LOOP
+    FOR y IN 2018..2024 LOOP
         << MONTH_LOOP >>
         FOR m IN 1..12 LOOP
             INSERT INTO work_hours (year, month, required_hours, user_id) (SELECT y, m, 0, id FROM app_user);

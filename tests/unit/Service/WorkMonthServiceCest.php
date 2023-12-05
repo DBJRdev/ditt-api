@@ -1574,6 +1574,56 @@ class WorkMonthServiceCest
         $I->assertEquals(36000, $service->calculateWorkedHours($workMonth));
     }
 
+    /**
+     * @throws \Exception
+     */
+    public function testCalculateApprovedBusinessTripWorkLogsWithoutWorkLogsDuringPublicHolidays(\UnitTester $I): void
+    {
+        $prophet = new Prophet();
+        $workMonth = $this->getWorkMonth($prophet);
+        $contracts = [$this->getContract($prophet)];
+
+        $businessTripWorkLogs = [
+            (new BusinessTripWorkLog())
+                ->setDate(new \DateTimeImmutable('2018-01-01'))
+                ->setTimeApproved(new \DateTimeImmutable('2018-01-01 23:59:59')),
+        ];
+
+        $service = $this->getWorkMonthService($prophet, [], $businessTripWorkLogs, [], [], [], [], [], [], [], [], [], $contracts);
+
+        $I->assertEquals(29160, $service->calculateWorkedHours($workMonth));
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function testCalculateApprovedBusinessTripWorkLogsWithoutBreakDuringPublicHolidays(\UnitTester $I): void
+    {
+        $prophet = new Prophet();
+        $workMonth = $this->getWorkMonth($prophet);
+        $contracts = [$this->getContract($prophet)];
+
+        $businessTripWorkLogs = [
+            (new BusinessTripWorkLog())
+                ->setDate(new \DateTimeImmutable('2018-01-01'))
+                ->setTimeApproved(new \DateTimeImmutable('2018-01-01 23:59:59')),
+        ];
+        $workLogs = [
+            (new WorkLog())
+                ->setWorkMonth($workMonth)
+                ->setStartTime(new \DateTimeImmutable('2018-01-01 10:00:00'))
+                ->setEndTime(new \DateTimeImmutable('2018-01-01 12:00:00')),
+            (new WorkLog())
+                ->setWorkMonth($workMonth)
+                ->setStartTime(new \DateTimeImmutable('2018-01-01 12:05:00'))
+                ->setEndTime(new \DateTimeImmutable('2018-01-01 14:05:00')),
+        ];
+
+        $service = $this->getWorkMonthService($prophet, [], $businessTripWorkLogs, [], [], [], [], [], [], [], [], $workLogs, $contracts);
+
+        $I->assertEquals(19440, $service->calculateWorkedHours($workMonth));
+    }
+
     // Home office work logs
 
     /**
