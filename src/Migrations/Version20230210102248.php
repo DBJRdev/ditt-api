@@ -29,7 +29,7 @@ final class Version20230210102248 extends AbstractMigration
 CREATE OR REPLACE FUNCTION end_of_month(date)
     RETURNS date AS
 $$
-SELECT (date_trunc(\'month\', $1) + interval \'1 month\' - interval \'1 day\')::date;
+SELECT (date_trunc(\'month\', $1) - interval \'1 day\')::date;
 $$ LANGUAGE \'sql\'
     IMMUTABLE STRICT;
     ');
