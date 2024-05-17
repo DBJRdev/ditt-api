@@ -129,6 +129,7 @@ class User implements UserInterface
         $this->firstName = '';
         $this->lastName = '';
         $this->roles = [self::ROLE_EMPLOYEE];
+        $this->isArchived = false;
         $this->contracts = new ArrayCollection();
         $this->supervised = new ArrayCollection();
         $this->vacations = new ArrayCollection();
