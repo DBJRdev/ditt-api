@@ -42,14 +42,14 @@ class WorkMonthRepository
     /**
      * @return WorkMonth[]
      */
-    public function findAllOpenedByUserBetweenDates(User $user, \DateTimeImmutable $dateFrom, ?\DateTimeImmutable $dateTo): array
+    public function findAllApprovedByUserBetweenDates(User $user, \DateTimeImmutable $dateFrom, ?\DateTimeImmutable $dateTo): array
     {
         $queryBuilder = $this->repository->createQueryBuilder('wm')
             ->select('wm')
             ->where('wm.user = :user')
-            ->andWhere('wm.status != :status')
+            ->andWhere('wm.status == :status')
             ->setParameter('user', $user)
-            ->setParameter('status', WorkMonth::STATUS_OPENED);
+            ->setParameter('status', WorkMonth::STATUS_APPROVED);
 
         $expr = $queryBuilder->expr();
         $yearFrom = $dateFrom->format('Y');

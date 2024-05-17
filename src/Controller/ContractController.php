@@ -113,7 +113,7 @@ class ContractController extends AbstractController
             );
         }
 
-        $filteredContracts = $this->workMonthRepository->findAllOpenedByUserBetweenDates(
+        $filteredContracts = $this->workMonthRepository->findAllApprovedByUserBetweenDates(
             $contract->getUser(),
             $dateTime->setTime(0, 0, 0),
             $contract->getEndDateTime()
@@ -122,7 +122,7 @@ class ContractController extends AbstractController
         if (count($filteredContracts) > 0) {
             return JsonResponse::create(
                 [
-                    'detail' => 'Unable to terminate contract. There are some work months after entered date that are not opened.',
+                    'detail' => 'Unable to terminate contract. There are some work months after entered date that are approved.',
                     'openedWorkMonths' => $this->normalizer->normalize(
                         $filteredContracts,
                         WorkMonth::class,
