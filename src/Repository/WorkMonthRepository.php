@@ -47,7 +47,7 @@ class WorkMonthRepository
         $queryBuilder = $this->repository->createQueryBuilder('wm')
             ->select('wm')
             ->where('wm.user = :user')
-            ->andWhere('wm.status == :status')
+            ->andWhere('wm.status = :status')
             ->setParameter('user', $user)
             ->setParameter('status', WorkMonth::STATUS_APPROVED);
 
