@@ -67,10 +67,12 @@ class ContractRepository
     public function findContractsAfter(Contract $contract): array
     {
         return $this->repository->createQueryBuilder('c')
-            ->where('c.id != :contractId')
+            ->where('c.user = :user')
+            ->andWhere('c.id != :contractId')
             ->andWhere('c.startDateTime >= :contractEndDateTime')
             ->setParameter('contractId', $contract->getId())
             ->setParameter('contractEndDateTime', $contract->getEndDateTime())
+            ->setParameter('user', $contract->getUser())
             ->getQuery()
             ->getResult();
     }
