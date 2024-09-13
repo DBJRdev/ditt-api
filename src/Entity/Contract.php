@@ -19,7 +19,8 @@ class Contract
 
     public function __construct()
     {
-        $this->startDateTime = (new \DateTimeImmutable())->setTime(0, 0, 0, 0);
+        $this->startDateTime = (new \DateTimeImmutable('now', new \DateTimeZone('UTC')))
+            ->setTime(0, 0, 0, 0);
         $this->endDateTime = null;
         $this->isDayBased = true;
         $this->isMondayIncluded = true;
@@ -62,7 +63,9 @@ class Contract
 
     public function setStartDateTime(\DateTimeImmutable $startDateTime): Contract
     {
-        $this->startDateTime = $startDateTime->setTime(0, 0, 0, 0);
+        $startDateTimeString = $startDateTime->format('Y-m-d');
+        $this->startDateTime = (new \DateTimeImmutable($startDateTimeString, new \DateTimeZone('UTC')))
+            ->setTime(23, 59, 59, 999);
 
         return $this;
     }
@@ -75,7 +78,9 @@ class Contract
     public function setEndDateTime(?\DateTimeImmutable $endDateTime): Contract
     {
         if ($endDateTime) {
-            $this->endDateTime = $endDateTime->setTime(23, 59, 59, 999);
+            $endDateTimeString = $endDateTime->format('Y-m-d');
+            $this->endDateTime = (new \DateTimeImmutable($endDateTimeString, new \DateTimeZone('UTC')))
+                ->setTime(23, 59, 59, 999);
         } else {
             $this->endDateTime = $endDateTime;
         }

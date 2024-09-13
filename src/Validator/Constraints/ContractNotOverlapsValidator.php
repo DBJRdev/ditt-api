@@ -56,19 +56,18 @@ class ContractNotOverlapsValidator extends ConstraintValidator
                     if ($otherContract->getEndDateTime() === null) {
                         return false;
                     }
-                    if ($otherContract->getEndDateTime() > $contract->getStartDateTime()) {
+                    if ($otherContract->getEndDateTime() >= $contract->getStartDateTime()) {
                         return false;
                     }
-                } else {
-                    if ($otherContract->getEndDateTime() === null) {
-                        if ($contract->getEndDateTime() > $otherContract->getStartDateTime()) {
-                            return false;
-                        }
-                    } else {
-                        if ($contract->getEndDateTime() > $otherContract->getStartDateTime() && $otherContract->getEndDateTime() > $contract->getStartDateTime()) {
-                            return false;
-                        }
+                } elseif ($otherContract->getEndDateTime() === null) {
+                    if ($contract->getEndDateTime() >= $otherContract->getStartDateTime()) {
+                        return false;
                     }
+                } elseif (
+                    $contract->getEndDateTime() >= $otherContract->getStartDateTime()
+                    && $otherContract->getEndDateTime() >= $contract->getStartDateTime()
+                ) {
+                    return false;
                 }
             }
         }
